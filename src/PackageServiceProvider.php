@@ -38,9 +38,6 @@ class PackageServiceProvider extends ServiceProvider
 
         // Assigning to the web middleware will ensure all other middleware assigned to 'web'
         // will execute. If you wish to extend the user interface, you'll use the web middleware
-        Route::middleware('web')
-            ->namespace($this->namespace)
-            ->group(__DIR__ . '/../routes/web.php');
 
         Route::middleware('api')
             ->namespace($this->namespace)

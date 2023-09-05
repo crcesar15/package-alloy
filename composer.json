@@ -15,14 +15,14 @@
     },
     "autoload": {
         "psr-4": {
-            "ProcessMaker\\Package\\PackageAlloy\\": "src",
+            "ProcessMaker\\Package\\Alloy\\": "src",
             "Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "ProcessMaker\\Package\\PackageAlloy\\PackageServiceProvider"
+                "ProcessMaker\\Package\\Alloy\\PackageServiceProvider"
             ]
         }
     },
