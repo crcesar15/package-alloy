@@ -1,6 +1,6 @@
 {
-    "name": "processmaker/package-skeleton",
-    "friendly_name": "Package Skeleton",
+    "name": "processmaker/package-alloy",
+    "friendly_name": "Package Alloy",
     "description": "Package skeleton to develop a package for ProcessMaker 4",
     "license": "AGPL-3.0-or-later",
     "version": "0.0.2",
@@ -15,14 +15,14 @@
     },
     "autoload": {
         "psr-4": {
-            "ProcessMaker\\Package\\PackageSkeleton\\": "src",
+            "ProcessMaker\\Package\\PackageAlloy\\": "src",
             "Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "ProcessMaker\\Package\\PackageSkeleton\\PackageServiceProvider"
+                "ProcessMaker\\Package\\PackageAlloy\\PackageServiceProvider"
             ]
         }
     },

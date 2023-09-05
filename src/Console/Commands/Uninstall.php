@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Package\PackageSkeleton\Console\Commands;
+namespace ProcessMaker\Package\PackageAlloy\Console\Commands;
 
 use Illuminate\Console\Command;
 
@@ -11,14 +11,14 @@ class Uninstall extends Command
      *
      * @var string
      */
-    protected $signature = 'package-skeleton:uninstall';
+    protected $signature = 'package-alloy:uninstall';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Uninstall Package Skeleton Package';
+    protected $description = 'Uninstall Package Alloy Package';
 
     /**
      * Execute the console command.
@@ -27,6 +27,6 @@ class Uninstall extends Command
      */
     public function handle()
     {
-        $this->info('Package Skeleton package Uninstalled');
+        $this->info('Package Alloy package Uninstalled');
     }
 }

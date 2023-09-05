@@ -1,17 +1,17 @@
 <?php
-namespace ProcessMaker\Package\PackageSkeleton;
+namespace ProcessMaker\Package\PackageAlloy;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use ProcessMaker\Package\Packages\Events\PackageEvent;
-use ProcessMaker\Package\PackageSkeleton\Http\Middleware\AddToMenus;
-use ProcessMaker\Package\PackageSkeleton\Listeners\PackageListener;
+use ProcessMaker\Package\PackageAlloy\Http\Middleware\AddToMenus;
+use ProcessMaker\Package\PackageAlloy\Listeners\PackageListener;
 
 class PackageServiceProvider extends ServiceProvider
 {
 
     // Assign the default namespace for our controllers
-    protected $namespace = '\ProcessMaker\Package\PackageSkeleton\Http\Controllers';
+    protected $namespace = '\ProcessMaker\Package\PackageAlloy\Http\Controllers';
 
     /**
      * If your plugin will provide any services, you can register them here.
@@ -56,11 +56,11 @@ class PackageServiceProvider extends ServiceProvider
             Route::pushMiddlewareToGroup('web', AddToMenus::class);
         }
 
-        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-skeleton');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-alloy');
 
         $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-skeleton'),
-        ], 'package-skeleton');
+            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-alloy'),
+        ], 'package-alloy');
 
         $this->app['events']->listen(PackageEvent::class, PackageListener::class);
 

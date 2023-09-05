@@ -56,8 +56,8 @@ function dashesToCamelCase($string, $capitalizeFirstCharacter = false, $replace 
     return $str;
 }
 
-searchDirectoryFiles(getcwd() . '/', 'package-skeleton', $argv[1]);
+searchDirectoryFiles(getcwd() . '/', 'package-alloy', $argv[1]);
 
-searchDirectoryFiles(getcwd() . '/', 'PackageSkeleton', dashesToCamelCase($argv[1], true));
+searchDirectoryFiles(getcwd() . '/', 'PackageAlloy', dashesToCamelCase($argv[1], true));
 
-searchDirectoryFiles(getcwd() . '/', 'Package Skeleton', dashesToCamelCase($argv[1], true, ' '));
+searchDirectoryFiles(getcwd() . '/', 'Package Alloy', dashesToCamelCase($argv[1], true, ' '));

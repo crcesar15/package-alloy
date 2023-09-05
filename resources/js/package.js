@@ -7,7 +7,7 @@ Vue.use(VModal);
 Vue.use(BootstrapVue);
 
 new Vue({
-    el: "#app-package-skeleton",
+    el: "#app-package-alloy",
     data: {
         filter: "",
         sample: {
@@ -50,7 +50,7 @@ new Vue({
             if (this.validateForm()) {
                 this.addError.name = null;
                 if (this.action === "Add") {
-                    ProcessMaker.apiClient.post("admin/package-skeleton", {
+                    ProcessMaker.apiClient.post("admin/package-alloy", {
                         name: this.sample.name,
                         status: this.sample.status
                     })
@@ -70,7 +70,7 @@ new Vue({
                             this.$refs.modal.hide();
                         });
                 } else {
-                    ProcessMaker.apiClient.patch(`admin/package-skeleton/${this.sample.id}`, {
+                    ProcessMaker.apiClient.patch(`admin/package-alloy/${this.sample.id}`, {
                         name: this.sample.name,
                         status: this.sample.status
                     })

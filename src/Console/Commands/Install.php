@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Package\PackageSkeleton\Console\Commands;
+namespace ProcessMaker\Package\PackageAlloy\Console\Commands;
 
 use Artisan;
 use ProcessMaker\Console\PackageInstallCommand;
@@ -12,14 +12,14 @@ class Install extends PackageInstallCommand
      *
      * @var string
      */
-    protected $signature = 'package-skeleton:install';
+    protected $signature = 'package-alloy:install';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Install Package Skeleton Package';
+    protected $description = 'Install Package Alloy Package';
 
     /**
      * Publish assets
@@ -29,7 +29,7 @@ class Install extends PackageInstallCommand
     {
         $this->info('Publishing assets');
         Artisan::call('vendor:publish', [
-            '--tag' => 'package-skeleton',
+            '--tag' => 'package-alloy',
             '--force' => true,
         ]);
     }
@@ -55,7 +55,7 @@ class Install extends PackageInstallCommand
     public function handle()
     {
         parent::handle();
-        $this->info('Package Skeleton has been installed');
+        $this->info('Package Alloy has been installed');
 
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Package\PackageSkeleton\Listeners;
+namespace ProcessMaker\Package\PackageAlloy\Listeners;
 
 use Carbon\Carbon;
 use DateTime;
