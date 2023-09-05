@@ -1,6 +1,13 @@
 <?php
 
-Route::group(['middleware' => ['auth:api', 'bindings']], function () {
-    Route::get('admin/package-alloy/fetch', [PackageAlloyController::class, 'fetch'])->name('package.skeleton.fetch');
-    Route::apiResource('admin/package-alloy', PackageAlloyController::class);
-});
+Route::group(
+    [
+        'middleware' => ['auth:api', 'bindings'],
+        'prefix' => 'api',
+        'as' => 'api.',
+        'namespace' => 'ProcessMaker\Package\Alloy\Http\Controllers\Api',
+    ],
+    function () {
+        Route::get('admin/package-alloy/fetch', 'PackageAlloyController@fetch')->name('package.alloy.fetch');
+    }
+);

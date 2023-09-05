@@ -1,17 +1,15 @@
 <?php
-namespace ProcessMaker\Package\PackageAlloy;
+
+namespace ProcessMaker\Package\Alloy;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use ProcessMaker\Package\Packages\Events\PackageEvent;
-use ProcessMaker\Package\PackageAlloy\Http\Middleware\AddToMenus;
-use ProcessMaker\Package\PackageAlloy\Listeners\PackageListener;
 
 class PackageServiceProvider extends ServiceProvider
 {
-
     // Assign the default namespace for our controllers
-    protected $namespace = '\ProcessMaker\Package\PackageAlloy\Http\Controllers';
+    protected $namespace = '\ProcessMaker\Package\Alloy\Http\Controllers\Api';
 
     /**
      * If your plugin will provide any services, you can register them here.
@@ -33,36 +31,24 @@ class PackageServiceProvider extends ServiceProvider
     public function boot()
     {
         //Register commands
-         $this->commands([
+        $this->commands([
             Console\Commands\Install::class,
             Console\Commands\Uninstall::class,
         ]);
 
-        if ($this->app->runningInConsole()) {
-            require(__DIR__ . '/../routes/console.php');
-        } else {
-            // Assigning to the web middleware will ensure all other middleware assigned to 'web'
-            // will execute. If you wish to extend the user interface, you'll use the web middleware
-            Route::middleware('web')
-                ->namespace($this->namespace)
-                ->group(__DIR__ . '/../routes/web.php');
+        // Assigning to the web middleware will ensure all other middleware assigned to 'web'
+        // will execute. If you wish to extend the user interface, you'll use the web middleware
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(__DIR__ . '/../routes/web.php');
 
-
-            Route::middleware('api')
-                ->namespace($this->namespace)
-                ->prefix('api/1.0')
-                ->group(__DIR__ . '/../routes/api.php');
-
-            Route::pushMiddlewareToGroup('web', AddToMenus::class);
-        }
-
-        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-alloy');
+        Route::middleware('api')
+            ->namespace($this->namespace)
+            ->prefix('api/1.0')
+            ->group(__DIR__ . '/../routes/api.php');
 
         $this->publishes([
-            __DIR__.'/../public' => public_path('vendor/processmaker/packages/package-alloy'),
+            __DIR__ . '/../public' => public_path('vendor/processmaker/packages/package-alloy'),
         ], 'package-alloy');
-
-        $this->app['events']->listen(PackageEvent::class, PackageListener::class);
-
     }
 }

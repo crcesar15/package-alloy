@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Package\PackageAlloy\Console\Commands;
+namespace ProcessMaker\Package\Alloy\Console\Commands;
 
 use Illuminate\Console\Command;
 

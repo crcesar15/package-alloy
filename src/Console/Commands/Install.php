@@ -1,6 +1,6 @@
 <?php
 
-namespace ProcessMaker\Package\PackageAlloy\Console\Commands;
+namespace ProcessMaker\Package\Alloy\Console\Commands;
 
 use Artisan;
 use ProcessMaker\Console\PackageInstallCommand;
@@ -56,6 +56,5 @@ class Install extends PackageInstallCommand
     {
         parent::handle();
         $this->info('Package Alloy has been installed');
-
     }
 }
