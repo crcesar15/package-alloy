@@ -1,103 +1,53 @@
-import Vue from "vue";
-import BootstrapVue from "bootstrap-vue";
-import VModal from "vue-js-modal";
-import SampleListing from "./components/SamplesListing";
+import AlloyRender from "./components/AlloyRender.vue";
+// import AlloyInspector from "./components/AlloyInspector.vue";
 
-Vue.use(VModal);
-Vue.use(BootstrapVue);
+Vue.component("AlloyRender", AlloyRender);
+// Vue.component("AlloyInspector", AlloyInspector);
 
-new Vue({
-    el: "#app-package-alloy",
-    data: {
-        filter: "",
-        sample: {
-            id: "",
-            name: "",
-            status: "ENABLED"
+window.ProcessMaker.EventBus.$on("screen-builder-init", (manager) => {
+  const initialControls = [];
+
+  initialControls.push({
+    editorComponent: AlloyRender,
+    editorBinding: "AlloyRender",
+    rendererComponent: AlloyRender,
+    rendererBinding: "AlloyRender",
+    control: {
+      label: "Alloy Verification",
+      component: "AlloyRender",
+      "editor-component": "AlloyRender",
+      "editor-control": "AlloyRender",
+      config: {
+        label: "Alloy Render",
+        name: "new_alloy_component",
+        validation: "",
+        fontSize: "1em",
+        icon: "fas fa-id-card",
+        helper: null,
+        apiToken: null,
+      },
+      inspector: [
+        {
+          type: "FormInput",
+          field: "name",
+          config: {
+            label: "Variable Name",
+            name: "Variable Name",
+            helper: "A variable name is a symbolic name to reference information.",
+            validation: "regex:/^(?:[A-Z_.a-z])(?:[0-9A-Z_.a-z])*$/|required",
+          },
         },
-        addError: {
-            name: null,
-            status: null
-        },
-        action: "Add"
+      ],
     },
-    components: {SampleListing},
-    methods: {
-        reload () {
-            this.$refs.listing.dataManager([{
-                field: "updated_at",
-                direction: "desc"
-            }]);
-        },
-        edit (data) {
-            this.sample.name = data.name;
-            this.sample.status = data.status;
-            this.sample.id = data.id;
-            this.action = "Edit";
-            this.$refs.modal.show();
-        },
-        validateForm () {
-            if (this.sample.name === "" || this.sample.name === null) {
-                this.submitted = false;
-                this.addError.name = ["The name field is required"];
-                return false;
-            }
-            return true;
-        },
-        onSubmit (evt) {
-            evt.preventDefault();
-            this.submitted = true;
-            if (this.validateForm()) {
-                this.addError.name = null;
-                if (this.action === "Add") {
-                    ProcessMaker.apiClient.post("admin/package-alloy", {
-                        name: this.sample.name,
-                        status: this.sample.status
-                    })
-                        .then((response) => {
-                            this.reload();
-                            ProcessMaker.alert("Sample successfully added ", "success");
-                            this.sample.name = "";
-                            this.sample.status = "ENABLED";
-                        })
-                        .catch((error) => {
-                            if (error.response.status === 422) {
-                                this.addError = error.response.data.errors;
-                            }
-                        })
-                        .finally(() => {
-                            this.submitted = false;
-                            this.$refs.modal.hide();
-                        });
-                } else {
-                    ProcessMaker.apiClient.patch(`admin/package-alloy/${this.sample.id}`, {
-                        name: this.sample.name,
-                        status: this.sample.status
-                    })
-                        .then((response) => {
-                            this.reload();
-                            ProcessMaker.alert("Sample successfully updated ", "success");
-                            this.sample.name = "";
-                            this.sample.status = "ENABLED";
-                        })
-                        .catch((error) => {
-                            if (error.response.status === 422) {
-                                this.addError = error.response.data.errors;
-                            }
-                        })
-                        .finally(() => {
-                            this.submitted = false;
-                            this.$refs.modal.hide();
-                            this.action = "create";
-                        });
-                }
-            }
-        },
-        clearForm () {
-            this.action = "Add";
-            this.id = "";
-            this.addError.name = null;
-            this.sample.name = "";
-        }
-    }
+  });
+
+  for (let i = 0; i < initialControls.length; i++) {
+    manager.addControl(
+      initialControls[i].control,
+      initialControls[i].rendererComponent,
+      initialControls[i].rendererBinding,
+      initialControls[i].builderComponent,
+      initialControls[i].builderBinding,
+    );
+  }
 });

@@ -1,4 +1,4 @@
-const mix = require('laravel-mix');
+const mix = require("laravel-mix");
 
 /*
 Your Processmaker Plugin webpack utilizes laravel mix in order to easily compile
@@ -14,14 +14,13 @@ service provider located at src/PluginServiceProvider.php already has the public
 folder configured for publishing by default.
  */
 
-mix.setPublicPath('public')
-    .js('resources/js/package.js', 'js')
-    .sass('resources/sass/package.scss', 'css')
-    .version()
-    .then(() => {
-        try {
-            require('./webpack.callback')();
-        } catch (e) {
-            //No callback found
-        }
-    });
+mix.setPublicPath("public")
+  .js("resources/js/screen-builder-form-components.js", "js")
+  .version()
+  .then(() => {
+    try {
+      require("./webpack.callback")();
+    } catch (e) {
+      // No callback found
+    }
+  });
