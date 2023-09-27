@@ -2,12 +2,12 @@
 
 Route::group(
     [
+        'prefix' => 'alloy',
         'middleware' => ['auth:api', 'bindings'],
-        'prefix' => 'api',
-        'as' => 'api.',
-        'namespace' => 'ProcessMaker\Package\Alloy\Http\Controllers\Api',
+        'namespace' => '\ProcessMaker\Package\Alloy\Http\Controllers\Api',
+        'as' => 'package-alloy.',
     ],
     function () {
-        Route::get('admin/package-alloy/fetch', 'PackageAlloyController@fetch')->name('package.alloy.fetch');
+        Route::get('/journeys', 'JourneysController@fetch')->name('journeys.fetch');
     }
 );
