@@ -4,12 +4,20 @@ namespace ProcessMaker\Package\Alloy;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use ProcessMaker\Package\Alloy\Http\Middleware\AddToMenus;
 use ProcessMaker\Package\Packages\Events\PackageEvent;
+use ProcessMaker\Traits\PluginServiceProviderTrait;
 
 class PackageServiceProvider extends ServiceProvider
 {
+    use PluginServiceProviderTrait;
+
+    const name = 'package-alloy';
+
+    const version = '1.0.0-BETA1';
+
     // Assign the default namespace for our controllers
-    protected $namespace = '\ProcessMaker\Package\Alloy\Http\Controllers\Api';
+    protected $namespace = '\ProcessMaker\Package\Alloy\Http\Controllers';
 
     /**
      * If your plugin will provide any services, you can register them here.
@@ -36,16 +44,28 @@ class PackageServiceProvider extends ServiceProvider
             Console\Commands\Uninstall::class,
         ]);
 
-        // Assigning to the web middleware will ensure all other middleware assigned to 'web'
-        // will execute. If you wish to extend the user interface, you'll use the web middleware
+        // Route web
+        Route::middleware('web')
+            ->namespace($this->namespace)
+            ->group(__DIR__ . '/../routes/web.php');
 
+        // Route api
         Route::middleware('api')
             ->namespace($this->namespace)
             ->prefix('api/1.0')
             ->group(__DIR__ . '/../routes/api.php');
 
+        Route::pushMiddlewareToGroup('web', AddToMenus::class);
+
+        // load migrations
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+
+        $this->loadViewsFrom(__DIR__ . '/../resources/views/', 'package-alloy');
+
         $this->publishes([
             __DIR__ . '/../public' => public_path('vendor/processmaker/packages/package-alloy'),
         ], 'package-alloy');
+
+        $this->completePluginBoot();
     }
 }

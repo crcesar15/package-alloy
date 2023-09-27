@@ -37,6 +37,13 @@ class Install extends PackageInstallCommand
     public function preinstall()
     {
         $this->publishAssets();
+
+        $this->info('Adding database tables');
+        $this->installMigrations(
+            [
+                __DIR__ . '/../../../database/migrations',
+            ]
+        );
     }
 
     public function install()
@@ -56,5 +63,16 @@ class Install extends PackageInstallCommand
     {
         parent::handle();
         $this->info('Package Alloy has been installed');
+    }
+
+    /**
+     * Install migrations.
+     *
+     * @param array $pluginMigrationsPaths Array of migration files
+     */
+    private function installMigrations(array $pluginMigrationsPaths)
+    {
+        $migrator = app('migrator');
+        $migrator->run($pluginMigrationsPaths);
     }
 }
