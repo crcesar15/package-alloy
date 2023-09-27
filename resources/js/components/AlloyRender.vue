@@ -1,18 +1,18 @@
 <template>
   <div>
-    <!-- <b-form-group
+    <b-form-group
       label="Name"
       label-for="name"
     >
       <b-form-input
         id="name"
-        v-model="myName"
+        v-model="output"
         type="text"
         placeholder="Enter the name of the controller"
         @input="onInput"
       />
       <b-form-group />
-    </b-form-group> -->
+    </b-form-group>
     <b-button
       variant="info"
       @click="openAlloy()"
@@ -29,7 +29,7 @@ import alloy from "@alloyidentity/web-sdk";
 export default {
   data() {
     return {
-      myName: "",
+      output: "",
       alloyInitParams: {
         key: "a7fcdfe0-7226-4be9-a8bf-6c0fdb497c9b",
         journeyApplicationToken: "JA-iYSmwNe7djplfNNcNNPH",
