@@ -10,15 +10,15 @@
       <div class="col-12 col-md-6 col-lg-2">
         <b-button
           block
-          @click="service = { id: 0 }"
+          @click="journey = { id: 0 }"
         >
-          <i class="fa fa-plus" /> {{ $t('Service') }}
+          <i class="fa fa-plus" /> {{ $t('Journey') }}
         </b-button>
       </div>
     </div>
     <b-card-text>
       <b-table
-        ref="services"
+        ref="journeys"
         class="bordered-table"
         hover
         responsive="xl"
@@ -58,7 +58,7 @@
                 variant="link"
                 data-action="Edit"
                 :title="$t('Edit')"
-                @click="editService(data.item)"
+                @click="editJourney(data.item)"
               >
                 <i class="fas fa-pen-square fa-lg fa-fw" />
               </b-btn>
@@ -66,7 +66,7 @@
                 v-b-tooltip.hover
                 variant="link"
                 :title="$t('Remove')"
-                @click="deleteService(data.item.id)"
+                @click="deleteJourney(data.item.id)"
               >
                 <i class="fas fa-trash-alt fa-lg fa-fw" />
               </b-btn>
@@ -100,9 +100,9 @@
       </div>
     </b-card-text>
     <journey-modal
-      :service-item="service"
-      @clearService="clearService"
-      @serviceSubmit="serviceSubmit"
+      :journey-item="journey"
+      @clearJourney="clearJourney"
+      @journeySubmit="journeySubmit"
     />
   </b-card>
 </template>
@@ -139,7 +139,7 @@ export default {
       ],
       meta: {},
       currentPage: 1,
-      service: null,
+      journey: null,
     };
   },
   methods: {
@@ -156,20 +156,20 @@ export default {
       }
       return [];
     },
-    serviceSubmit(body) {
+    journeySubmit(body) {
       if (body) {
-        if (this.service.id === 0) {
-          this.createService(body);
+        if (this.journey.id === 0) {
+          this.createJourney(body);
         } else {
-          this.updateService(this.service.id, body);
+          this.updateJourney(this.journey.id, body);
         }
       }
     },
-    createService(body) {
+    createJourney(body) {
       ProcessMaker.apiClient
-        .post("/esign/services", body)
+        .post("/esign/journeys", body)
         .then(() => {
-          ProcessMaker.alert(this.$t("Service successfully added"), "success");
+          ProcessMaker.alert(this.$t("Journey successfully added"), "success");
         })
         .catch((error) => {
           if (error.response.status === 422) {
@@ -177,11 +177,11 @@ export default {
           }
         });
     },
-    updateService(id, body) {
+    updateJourney(id, body) {
       ProcessMaker.apiClient
-        .put(`/esign/services/${id}`, body)
+        .put(`/esign/journeys/${id}`, body)
         .then(() => {
-          ProcessMaker.alert("Service successfully updated", "success");
+          ProcessMaker.alert("Journey successfully updated", "success");
         })
         .catch((error) => {
           if (error.response.status === 422) {
@@ -189,17 +189,17 @@ export default {
           }
         });
     },
-    deleteService(id) {
+    deleteJourney(id) {
       ProcessMaker.confirmModal(
         "Caution!",
-        this.$t("Are you sure to delete this service?"),
+        this.$t("Are you sure to delete this journey?"),
         "",
         () => {
           ProcessMaker.apiClient
-            .delete(`/esign/services/${id}`)
+            .delete(`/esign/journeys/${id}`)
             .then(() => {
-              ProcessMaker.alert("Service successfully deleted", "success");
-              this.clearService();
+              ProcessMaker.alert("Journey successfully deleted", "success");
+              this.clearJourney();
             })
             .catch((error) => {
               if (error.response.status === 422) {
@@ -209,14 +209,14 @@ export default {
         },
       );
     },
-    editService(item) {
-      const service = item;
-      service.provider = item.credentials.provider;
-      this.service = service;
+    editJourney(item) {
+      const journey = item;
+      journey.provider = item.credentials.provider;
+      this.journey = journey;
     },
-    clearService() {
-      this.service = null;
-      this.$refs.services.refresh();
+    clearJourney() {
+      this.journey = null;
+      this.$refs.journeys.refresh();
     },
   },
 };

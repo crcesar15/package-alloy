@@ -97,7 +97,7 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    serviceItem: {
+    journeyItem: {
       type: Object,
       "default": null
     }
@@ -105,27 +105,26 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       modalTitle: "Service",
-      service: {
+      journey: {
         name: "",
         description: "",
-        provider: null,
         credentials: {},
         status: "ACTIVE"
       },
       provider: null,
       submitted: false,
-      serviceValidation: false
+      journeyValidation: false
     };
   },
   computed: {
-    serviceNameState: function serviceNameState() {
-      if (this.submitted === true && this.service.name === "") {
+    journeyNameState: function journeyNameState() {
+      if (this.submitted === true && this.journey.name === "") {
         return false;
       }
       return null;
     },
-    serviceProviderState: function serviceProviderState() {
-      if (this.submitted === true && this.service.provider === null) {
+    journeyProviderState: function journeyProviderState() {
+      if (this.submitted === true && this.journey.provider === null) {
         return false;
       }
       return null;
@@ -133,18 +132,18 @@ __webpack_require__.r(__webpack_exports__);
   },
   watch: {
     provider: function provider() {
-      this.service.provider = this.provider;
+      this.journey.provider = this.provider;
     },
-    serviceItem: function serviceItem(service) {
-      if (service !== null) {
-        if (service.id === 0) {
-          // create service
+    journeyItem: function journeyItem(journey) {
+      if (journey !== null) {
+        if (journey.id === 0) {
+          // create journey
           this.modalTitle = this.$t("Add Service");
         } else {
-          // update service
+          // update journey
           this.modalTitle = this.$t("Update Service");
-          this.service = service;
-          this.provider = service.provider;
+          this.journey = journey;
+          this.provider = journey.provider;
         }
         this.showModal();
       }
@@ -152,8 +151,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     getServiceData: function getServiceData(data) {
-      this.serviceValidation = data.validated;
-      this.service.credentials = data.credentials;
+      this.journeyValidation = data.validated;
+      this.journey.credentials = data.credentials;
     },
     submit: function submit() {
       var _this = this;
@@ -162,45 +161,45 @@ __webpack_require__.r(__webpack_exports__);
       this.$nextTick(function () {
         if (_this.validate()) {
           body = {
-            name: _this.service.name,
-            description: _this.service.description,
-            credentials: _this.service.credentials,
-            status: _this.service.status
+            name: _this.journey.name,
+            description: _this.journey.description,
+            credentials: _this.journey.credentials,
+            status: _this.journey.status
           };
-          body.credentials.provider = _this.service.provider;
+          body.credentials.provider = _this.journey.provider;
           _this.hideModal();
           _this.submitted = false;
         }
-        _this.$emit("serviceSubmit", body);
+        _this.$emit("journeySubmit", body);
       });
     },
     showModal: function showModal() {
-      this.$bvModal.show("service-modal");
+      this.$bvModal.show("journey-modal");
     },
     hideModal: function hideModal() {
-      this.$bvModal.hide("service-modal");
+      this.$bvModal.hide("journey-modal");
     },
     validate: function validate() {
-      var service = this.service;
-      console.log(service.name, service.provider, this.serviceValidation);
-      if (service.name === undefined || service.name === "") {
+      var journey = this.journey;
+      console.log(journey.name, journey.provider, this.journeyValidation);
+      if (journey.name === undefined || journey.name === "") {
         return false;
       }
-      if (service.provider === null) {
+      if (journey.provider === null) {
         return false;
       }
-      if (!this.serviceValidation) return false;
+      if (!this.journeyValidation) return false;
       return true;
     },
     clearService: function clearService() {
-      this.service = {
+      this.journey = {
         name: "",
         description: "",
         provider: null,
         status: "ACTIVE"
       };
-      this.service.credentials = {};
-      this.serviceValidation = false;
+      this.journey.credentials = {};
+      this.journeyValidation = false;
       this.submitted = false;
       this.$emit("clearService");
     }
@@ -249,7 +248,7 @@ __webpack_require__.r(__webpack_exports__);
       }],
       meta: {},
       currentPage: 1,
-      service: null
+      journey: null
     };
   },
   methods: {
@@ -264,41 +263,41 @@ __webpack_require__.r(__webpack_exports__);
       }
       return [];
     },
-    serviceSubmit: function serviceSubmit(body) {
+    journeySubmit: function journeySubmit(body) {
       if (body) {
-        if (this.service.id === 0) {
-          this.createService(body);
+        if (this.journey.id === 0) {
+          this.createJourney(body);
         } else {
-          this.updateService(this.service.id, body);
+          this.updateJourney(this.journey.id, body);
         }
       }
     },
-    createService: function createService(body) {
+    createJourney: function createJourney(body) {
       var _this2 = this;
-      ProcessMaker.apiClient.post("/esign/services", body).then(function () {
-        ProcessMaker.alert(_this2.$t("Service successfully added"), "success");
+      ProcessMaker.apiClient.post("/esign/journeys", body).then(function () {
+        ProcessMaker.alert(_this2.$t("Journey successfully added"), "success");
       })["catch"](function (error) {
         if (error.response.status === 422) {
           _this2.addError = error.response.data.errors;
         }
       });
     },
-    updateService: function updateService(id, body) {
+    updateJourney: function updateJourney(id, body) {
       var _this3 = this;
-      ProcessMaker.apiClient.put("/esign/services/".concat(id), body).then(function () {
-        ProcessMaker.alert("Service successfully updated", "success");
+      ProcessMaker.apiClient.put("/esign/journeys/".concat(id), body).then(function () {
+        ProcessMaker.alert("Journey successfully updated", "success");
       })["catch"](function (error) {
         if (error.response.status === 422) {
           _this3.addError = error.response.data.errors;
         }
       });
     },
-    deleteService: function deleteService(id) {
+    deleteJourney: function deleteJourney(id) {
       var _this4 = this;
-      ProcessMaker.confirmModal("Caution!", this.$t("Are you sure to delete this service?"), "", function () {
-        ProcessMaker.apiClient["delete"]("/esign/services/".concat(id)).then(function () {
-          ProcessMaker.alert("Service successfully deleted", "success");
-          _this4.clearService();
+      ProcessMaker.confirmModal("Caution!", this.$t("Are you sure to delete this journey?"), "", function () {
+        ProcessMaker.apiClient["delete"]("/esign/journeys/".concat(id)).then(function () {
+          ProcessMaker.alert("Journey successfully deleted", "success");
+          _this4.clearJourney();
         })["catch"](function (error) {
           if (error.response.status === 422) {
             _this4.addError = error.response.data.errors;
@@ -306,14 +305,14 @@ __webpack_require__.r(__webpack_exports__);
         });
       });
     },
-    editService: function editService(item) {
-      var service = item;
-      service.provider = item.credentials.provider;
-      this.service = service;
+    editJourney: function editJourney(item) {
+      var journey = item;
+      journey.provider = item.credentials.provider;
+      this.journey = journey;
     },
-    clearService: function clearService() {
-      this.service = null;
-      this.$refs.services.refresh();
+    clearJourney: function clearJourney() {
+      this.journey = null;
+      this.$refs.journeys.refresh();
     }
   }
 });
@@ -336,7 +335,7 @@ var render = function render() {
     _c = _vm._self._c;
   return _c("b-modal", {
     attrs: {
-      id: "service-modal"
+      id: "journey-modal"
     },
     on: {
       hidden: _vm.clearService
@@ -379,32 +378,32 @@ var render = function render() {
       },
       proxy: true
     }])
-  }, [_vm._v(" "), _c("div", [_c("b-form-group", {
+  }, [_vm._v(" "), _c("b-form-group", {
     attrs: {
-      id: "service-name-label",
+      id: "journey-name-label",
       "invalid-feedback": _vm.$t("Name is required"),
       label: _vm.$t("Name"),
-      "label-for": "service-name",
-      state: _vm.serviceNameState
+      "label-for": "journey-name",
+      state: _vm.journeyNameState
     }
   }, [_c("b-form-input", {
     attrs: {
-      id: "Service-name",
+      id: "journey-name",
       placeholder: _vm.$t("Name"),
-      state: _vm.serviceNameState
+      state: _vm.journeyNameState
     },
     model: {
-      value: _vm.service.name,
+      value: _vm.journey.name,
       callback: function callback($$v) {
-        _vm.$set(_vm.service, "name", $$v);
+        _vm.$set(_vm.journey, "name", $$v);
       },
-      expression: "service.name"
+      expression: "journey.name"
     }
   })], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
-      id: "service-description-label",
+      id: "journey-description-label",
       label: _vm.$t("Description"),
-      "label-for": "service-description"
+      "label-for": "journey-description"
     }
   }, [_c("b-form-textarea", {
     attrs: {
@@ -413,73 +412,54 @@ var render = function render() {
       rows: "2"
     },
     model: {
-      value: _vm.service.description,
+      value: _vm.journey.description,
       callback: function callback($$v) {
-        _vm.$set(_vm.service, "description", $$v);
+        _vm.$set(_vm.journey, "description", $$v);
       },
-      expression: "service.description"
+      expression: "journey.description"
     }
-  })], 1), _vm._v(" "), _vm.provider === "lightico" ? _c("div", [_c("lightico-credentials", {
+  })], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
-      "service-credentials": _vm.service.credentials,
-      submitted: _vm.submitted
+      id: "journey-username-label",
+      "invalid-feedback": _vm.$t("Username is required"),
+      label: _vm.$t("Username"),
+      "label-for": "journey-username",
+      state: _vm.journeyNameState
+    }
+  }, [_c("b-form-input", {
+    attrs: {
+      id: "journey-name",
+      placeholder: _vm.$t("Name"),
+      state: _vm.journeyNameState
     },
-    on: {
-      retrieveData: _vm.getServiceData
+    model: {
+      value: _vm.journey.name,
+      callback: function callback($$v) {
+        _vm.$set(_vm.journey, "name", $$v);
+      },
+      expression: "journey.name"
     }
-  })], 1) : _vm._e(), _vm._v(" "), _vm.provider === "adobeSign" ? _c("div", [_c("adobe-sign-credentials", {
+  })], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
-      "service-credentials": _vm.service.credentials,
-      submitted: _vm.submitted
-    },
-    on: {
-      retrieveData: _vm.getServiceData
-    }
-  })], 1) : _vm._e(), _vm._v(" "), _vm.provider === "docuSign" ? _c("div", [_c("docu-sign-credentials", {
-    attrs: {
-      "service-credentials": _vm.service.credentials,
-      submitted: _vm.submitted
-    },
-    on: {
-      retrieveData: _vm.getServiceData
-    }
-  })], 1) : _vm._e(), _vm._v(" "), _vm.provider === "helloSign" ? _c("div", [_c("hello-sign-credentials", {
-    attrs: {
-      "service-credentials": _vm.service.credentials,
-      submitted: _vm.submitted
-    },
-    on: {
-      retrieveData: _vm.getServiceData
-    }
-  })], 1) : _vm._e(), _vm._v(" "), _vm.provider === "imm" ? _c("div", [_c("imm-credentials", {
-    attrs: {
-      "service-credentials": _vm.service.credentials,
-      submitted: _vm.submitted
-    },
-    on: {
-      retrieveData: _vm.getServiceData
-    }
-  })], 1) : _vm._e()], 1), _vm._v(" "), _c("b-form-group", {
-    attrs: {
-      id: "service-status-label",
+      id: "journey-status-label",
       label: _vm.$t("Status"),
-      "label-for": "service-status"
+      "label-for": "journey-status"
     }
   }, [_c("b-form-checkbox", {
     attrs: {
-      id: "service-status",
+      id: "journey-status",
       "switch": "",
       value: _vm.$t("ACTIVE"),
       "unchecked-value": _vm.$t("INACTIVE")
     },
     model: {
-      value: _vm.service.status,
+      value: _vm.journey.status,
       callback: function callback($$v) {
-        _vm.$set(_vm.service, "status", $$v);
+        _vm.$set(_vm.journey, "status", $$v);
       },
-      expression: "service.status"
+      expression: "journey.status"
     }
-  }, [_vm._v("\n      " + _vm._s(_vm.$t("The service is "))), _c("strong", [_vm._v(_vm._s(_vm.$t(_vm.service.status)))])])], 1)], 1);
+  }, [_vm._v("\n      " + _vm._s(_vm.$t("The journey is "))), _c("strong", [_vm._v(_vm._s(_vm.$t(_vm.journey.status)))])])], 1)], 1);
 };
 var staticRenderFns = [];
 render._withStripped = true;
@@ -529,15 +509,15 @@ var render = function render() {
     },
     on: {
       click: function click($event) {
-        _vm.service = {
+        _vm.journey = {
           id: 0
         };
       }
     }
   }, [_c("i", {
     staticClass: "fa fa-plus"
-  }), _vm._v(" " + _vm._s(_vm.$t("Service")) + "\n      ")])], 1)]), _vm._v(" "), _c("b-card-text", [_c("b-table", {
-    ref: "services",
+  }), _vm._v(" " + _vm._s(_vm.$t("Journey")) + "\n      ")])], 1)]), _vm._v(" "), _c("b-card-text", [_c("b-table", {
+    ref: "journeys",
     staticClass: "bordered-table",
     attrs: {
       hover: "",
@@ -607,7 +587,7 @@ var render = function render() {
           },
           on: {
             click: function click($event) {
-              return _vm.editService(data.item);
+              return _vm.editJourney(data.item);
             }
           }
         }, [_c("i", {
@@ -626,7 +606,7 @@ var render = function render() {
           },
           on: {
             click: function click($event) {
-              return _vm.deleteService(data.item.id);
+              return _vm.deleteJourney(data.item.id);
             }
           }
         }, [_c("i", {
@@ -663,11 +643,11 @@ var render = function render() {
     staticClass: "col-12 col-md-6 col-lg-4 order-md-1 text-center text-md-left mb-3"
   }, [_vm._v("\n        " + _vm._s(1 + (_vm.meta.current_page - 1) * 10) + " -\n        " + _vm._s(_vm.meta.total > _vm.meta.current_page * 10 ? _vm.meta.current_page * 10 : _vm.meta.total) + "\n        " + _vm._s(_vm.$t("of")) + " " + _vm._s(_vm.meta.total) + " " + _vm._s(_vm.$t("Journeys")) + "\n      ")])])], 1), _vm._v(" "), _c("journey-modal", {
     attrs: {
-      "service-item": _vm.service
+      "journey-item": _vm.journey
     },
     on: {
-      clearService: _vm.clearService,
-      serviceSubmit: _vm.serviceSubmit
+      clearJourney: _vm.clearJourney,
+      journeySubmit: _vm.journeySubmit
     }
   })], 1);
 };
