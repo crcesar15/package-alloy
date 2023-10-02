@@ -100,7 +100,7 @@
       </div>
     </b-card-text>
     <journey-modal
-      :journey-item="journey"
+      v-model="selectedJourney"
       @clearJourney="clearJourney"
       @journeySubmit="journeySubmit"
     />
@@ -139,7 +139,7 @@ export default {
       ],
       meta: {},
       currentPage: 1,
-      journey: null,
+      selectedJourney: null,
     };
   },
   methods: {

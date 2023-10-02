@@ -97,7 +97,7 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
-    journeyItem: {
+    journey: {
       type: Object,
       "default": null
     }
@@ -105,13 +105,14 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       modalTitle: "Service",
-      journey: {
-        name: "",
-        description: "",
-        credentials: {},
-        status: "ACTIVE"
-      },
-      provider: null,
+      name: "",
+      description: "",
+      username: "",
+      password: "",
+      token: "",
+      sdk: "",
+      status: "ACTIVE",
+      environment: "SandBox",
       submitted: false,
       journeyValidation: false
     };
@@ -128,32 +129,47 @@ __webpack_require__.r(__webpack_exports__);
         return false;
       }
       return null;
+    },
+    journeyUsernameState: function journeyUsernameState() {
+      if (this.submitted === true && this.journey.credentials.username === "") {
+        return false;
+      }
+      return null;
+    },
+    journeyPasswordState: function journeyPasswordState() {
+      if (this.submitted === true && this.journey.credentials.password === "") {
+        return false;
+      }
+      return null;
+    },
+    journeyTokenState: function journeyTokenState() {
+      if (this.submitted === true && this.journey.credentials.token === "") {
+        return false;
+      }
+      return null;
+    },
+    journeySdkState: function journeySdkState() {
+      if (this.submitted === true && this.journey.credentials.sdk === "") {
+        return false;
+      }
+      return null;
     }
   },
   watch: {
-    provider: function provider() {
-      this.journey.provider = this.provider;
-    },
-    journeyItem: function journeyItem(journey) {
-      if (journey !== null) {
-        if (journey.id === 0) {
-          // create journey
-          this.modalTitle = this.$t("Add Service");
-        } else {
-          // update journey
-          this.modalTitle = this.$t("Update Service");
-          this.journey = journey;
-          this.provider = journey.provider;
-        }
-        this.showModal();
+    journey: function journey(_journey) {
+      if (_journey !== null) {
+        this.name = _journey.name;
+        this.description = _journey.description;
+        this.username = _journey.configuration.username;
+        this.password = _journey.configuration.password;
+        this.token = _journey.configuration.token;
+        this.sdk = _journey.configuration.sdk;
+        this.environment = _journey.configuration.environment;
+        this.status = _journey.status;
       }
     }
   },
   methods: {
-    getServiceData: function getServiceData(data) {
-      this.journeyValidation = data.validated;
-      this.journey.credentials = data.credentials;
-    },
     submit: function submit() {
       var _this = this;
       this.submitted = true;
@@ -161,16 +177,21 @@ __webpack_require__.r(__webpack_exports__);
       this.$nextTick(function () {
         if (_this.validate()) {
           body = {
-            name: _this.journey.name,
-            description: _this.journey.description,
-            credentials: _this.journey.credentials,
-            status: _this.journey.status
+            name: _this.name,
+            description: _this.description,
+            configuration: {
+              username: _this.username,
+              password: _this.password,
+              token: _this.token,
+              sdk: _this.sdk,
+              environment: _this.environment
+            },
+            status: _this.status
           };
-          body.credentials.provider = _this.journey.provider;
           _this.hideModal();
           _this.submitted = false;
         }
-        _this.$emit("journeySubmit", body);
+        _this.$emit("input", body);
       });
     },
     showModal: function showModal() {
@@ -180,25 +201,32 @@ __webpack_require__.r(__webpack_exports__);
       this.$bvModal.hide("journey-modal");
     },
     validate: function validate() {
-      var journey = this.journey;
-      console.log(journey.name, journey.provider, this.journeyValidation);
-      if (journey.name === undefined || journey.name === "") {
+      if (this.name === undefined || this.name === "") {
         return false;
       }
-      if (journey.provider === null) {
+      if (this.username === undefined || this.username === "") {
         return false;
       }
-      if (!this.journeyValidation) return false;
+      if (this.password === undefined || this.password === "") {
+        return false;
+      }
+      if (this.token === undefined || this.token === "") {
+        return false;
+      }
+      if (this.sdk === undefined || this.sdk === "") {
+        return false;
+      }
       return true;
     },
     clearService: function clearService() {
-      this.journey = {
-        name: "",
-        description: "",
-        provider: null,
-        status: "ACTIVE"
-      };
-      this.journey.credentials = {};
+      this.name = "";
+      this.description = "";
+      this.username = "";
+      this.password = "";
+      this.token = "";
+      this.sdk = "";
+      this.status = "ACTIVE";
+      this.environment = "SandBox";
       this.journeyValidation = false;
       this.submitted = false;
       this.$emit("clearService");
@@ -248,7 +276,7 @@ __webpack_require__.r(__webpack_exports__);
       }],
       meta: {},
       currentPage: 1,
-      journey: null
+      selectedJourney: null
     };
   },
   methods: {
@@ -393,11 +421,11 @@ var render = function render() {
       state: _vm.journeyNameState
     },
     model: {
-      value: _vm.journey.name,
+      value: _vm.name,
       callback: function callback($$v) {
-        _vm.$set(_vm.journey, "name", $$v);
+        _vm.name = $$v;
       },
-      expression: "journey.name"
+      expression: "name"
     }
   })], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
@@ -412,11 +440,11 @@ var render = function render() {
       rows: "2"
     },
     model: {
-      value: _vm.journey.description,
+      value: _vm.description,
       callback: function callback($$v) {
-        _vm.$set(_vm.journey, "description", $$v);
+        _vm.description = $$v;
       },
-      expression: "journey.description"
+      expression: "description"
     }
   })], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
@@ -424,22 +452,105 @@ var render = function render() {
       "invalid-feedback": _vm.$t("Username is required"),
       label: _vm.$t("Username"),
       "label-for": "journey-username",
-      state: _vm.journeyNameState
+      state: _vm.journeyUsernameState
     }
   }, [_c("b-form-input", {
     attrs: {
       id: "journey-name",
-      placeholder: _vm.$t("Name"),
-      state: _vm.journeyNameState
+      placeholder: _vm.$t("Username"),
+      state: _vm.journeyUsernameState
     },
     model: {
-      value: _vm.journey.name,
+      value: _vm.credentials.username,
       callback: function callback($$v) {
-        _vm.$set(_vm.journey, "name", $$v);
+        _vm.$set(_vm.credentials, "username", $$v);
       },
-      expression: "journey.name"
+      expression: "credentials.username"
     }
   })], 1), _vm._v(" "), _c("b-form-group", {
+    attrs: {
+      id: "journey-password-label",
+      "invalid-feedback": _vm.$t("Password is required"),
+      label: _vm.$t("Password"),
+      "label-for": "journey-password",
+      state: _vm.journeyPasswordState
+    }
+  }, [_c("b-form-input", {
+    attrs: {
+      id: "journey-password",
+      state: _vm.journeyPasswordState,
+      type: "password"
+    },
+    model: {
+      value: _vm.credentials.password,
+      callback: function callback($$v) {
+        _vm.$set(_vm.credentials, "password", $$v);
+      },
+      expression: "credentials.password"
+    }
+  })], 1), _vm._v(" "), _c("b-form-group", {
+    attrs: {
+      id: "journey-token-label",
+      "invalid-feedback": _vm.$t("Journey Token is required"),
+      label: _vm.$t("Journey Token"),
+      "label-for": "journey-token",
+      state: _vm.journeyTokenState
+    }
+  }, [_c("b-form-input", {
+    attrs: {
+      id: "journey-token",
+      placeholder: _vm.$t("Journey Token"),
+      state: _vm.journeyTokenState
+    },
+    model: {
+      value: _vm.token,
+      callback: function callback($$v) {
+        _vm.token = $$v;
+      },
+      expression: "token"
+    }
+  })], 1), _vm._v(" "), _c("b-form-group", {
+    attrs: {
+      id: "journey-sdk-label",
+      "invalid-feedback": _vm.$t("Journey SDK is required"),
+      label: _vm.$t("Journey SDK"),
+      "label-for": "journey-sdk",
+      state: _vm.journeySdkState
+    }
+  }, [_c("b-form-input", {
+    attrs: {
+      id: "journey-sdk",
+      placeholder: _vm.$t("Journey SDK"),
+      state: _vm.journeySdkState
+    },
+    model: {
+      value: _vm.sdk,
+      callback: function callback($$v) {
+        _vm.sdk = $$v;
+      },
+      expression: "sdk"
+    }
+  })], 1), _vm._v(" "), _c("b-form-group", {
+    attrs: {
+      id: "journey-environment-label",
+      label: _vm.$t("Environment"),
+      "label-for": "journey-environment"
+    }
+  }, [_c("b-form-checkbox", {
+    attrs: {
+      id: "journey-environment",
+      "switch": "",
+      value: _vm.$t("Production"),
+      "unchecked-value": _vm.$t("SandBox")
+    },
+    model: {
+      value: _vm.environment,
+      callback: function callback($$v) {
+        _vm.environment = $$v;
+      },
+      expression: "environment"
+    }
+  }, [_c("strong", [_vm._v(_vm._s(_vm.$t(_vm.environment)))])])], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
       id: "journey-status-label",
       label: _vm.$t("Status"),
@@ -453,13 +564,13 @@ var render = function render() {
       "unchecked-value": _vm.$t("INACTIVE")
     },
     model: {
-      value: _vm.journey.status,
+      value: _vm.status,
       callback: function callback($$v) {
-        _vm.$set(_vm.journey, "status", $$v);
+        _vm.status = $$v;
       },
-      expression: "journey.status"
+      expression: "status"
     }
-  }, [_vm._v("\n      " + _vm._s(_vm.$t("The journey is "))), _c("strong", [_vm._v(_vm._s(_vm.$t(_vm.journey.status)))])])], 1)], 1);
+  }, [_vm._v("\n      " + _vm._s(_vm.$t("The journey is "))), _c("strong", [_vm._v(_vm._s(_vm.$t(_vm.status)))])])], 1)], 1);
 };
 var staticRenderFns = [];
 render._withStripped = true;
@@ -642,12 +753,16 @@ var render = function render() {
   })], 1), _vm._v(" "), _c("div", {
     staticClass: "col-12 col-md-6 col-lg-4 order-md-1 text-center text-md-left mb-3"
   }, [_vm._v("\n        " + _vm._s(1 + (_vm.meta.current_page - 1) * 10) + " -\n        " + _vm._s(_vm.meta.total > _vm.meta.current_page * 10 ? _vm.meta.current_page * 10 : _vm.meta.total) + "\n        " + _vm._s(_vm.$t("of")) + " " + _vm._s(_vm.meta.total) + " " + _vm._s(_vm.$t("Journeys")) + "\n      ")])])], 1), _vm._v(" "), _c("journey-modal", {
-    attrs: {
-      "journey-item": _vm.journey
-    },
     on: {
       clearJourney: _vm.clearJourney,
       journeySubmit: _vm.journeySubmit
+    },
+    model: {
+      value: _vm.selectedJourney,
+      callback: function callback($$v) {
+        _vm.selectedJourney = $$v;
+      },
+      expression: "selectedJourney"
     }
   })], 1);
 };

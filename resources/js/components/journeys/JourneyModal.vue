@@ -15,7 +15,7 @@
     >
       <b-form-input
         id="journey-name"
-        v-model="journey.name"
+        v-model="name"
         :placeholder="$t('Name')"
         :state="journeyNameState"
       />
@@ -27,7 +27,7 @@
     >
       <b-form-textarea
         id="Service-description"
-        v-model="journey.description"
+        v-model="description"
         :placeholder="$t('Description')"
         rows="2"
       />
@@ -37,14 +37,71 @@
       :invalid-feedback="$t('Username is required')"
       :label="$t('Username')"
       label-for="journey-username"
-      :state="journeyNameState"
+      :state="journeyUsernameState"
     >
       <b-form-input
         id="journey-name"
-        v-model="journey.name"
-        :placeholder="$t('Name')"
-        :state="journeyNameState"
+        v-model="credentials.username"
+        :placeholder="$t('Username')"
+        :state="journeyUsernameState"
       />
+    </b-form-group>
+    <b-form-group
+      id="journey-password-label"
+      :invalid-feedback="$t('Password is required')"
+      :label="$t('Password')"
+      label-for="journey-password"
+      :state="journeyPasswordState"
+    >
+      <b-form-input
+        id="journey-password"
+        v-model="credentials.password"
+        :state="journeyPasswordState"
+        type="password"
+      />
+    </b-form-group>
+    <b-form-group
+      id="journey-token-label"
+      :invalid-feedback="$t('Journey Token is required')"
+      :label="$t('Journey Token')"
+      label-for="journey-token"
+      :state="journeyTokenState"
+    >
+      <b-form-input
+        id="journey-token"
+        v-model="token"
+        :placeholder="$t('Journey Token')"
+        :state="journeyTokenState"
+      />
+    </b-form-group>
+    <b-form-group
+      id="journey-sdk-label"
+      :invalid-feedback="$t('Journey SDK is required')"
+      :label="$t('Journey SDK')"
+      label-for="journey-sdk"
+      :state="journeySdkState"
+    >
+      <b-form-input
+        id="journey-sdk"
+        v-model="sdk"
+        :placeholder="$t('Journey SDK')"
+        :state="journeySdkState"
+      />
+    </b-form-group>
+    <b-form-group
+      id="journey-environment-label"
+      :label="$t('Environment')"
+      label-for="journey-environment"
+    >
+      <b-form-checkbox
+        id="journey-environment"
+        v-model="environment"
+        switch
+        :value="$t('Production')"
+        :unchecked-value="$t('SandBox')"
+      >
+        <strong>{{ $t(environment) }}</strong>
+      </b-form-checkbox>
     </b-form-group>
     <b-form-group
       id="journey-status-label"
@@ -53,12 +110,12 @@
     >
       <b-form-checkbox
         id="journey-status"
-        v-model="journey.status"
+        v-model="status"
         switch
         :value="$t('ACTIVE')"
         :unchecked-value="$t('INACTIVE')"
       >
-        {{ $t('The journey is ') }}<strong>{{ $t(journey.status) }}</strong>
+        {{ $t('The journey is ') }}<strong>{{ $t(status) }}</strong>
       </b-form-checkbox>
     </b-form-group>
     <template #modal-footer>
@@ -84,18 +141,19 @@
 
 export default {
   props: {
-    journeyItem: { type: Object, default: null },
+    journey: { type: Object, default: null },
   },
   data() {
     return {
       modalTitle: "Service",
-      journey: {
-        name: "",
-        description: "",
-        credentials: {},
-        status: "ACTIVE",
-      },
-      provider: null,
+      name: "",
+      description: "",
+      username: "",
+      password: "",
+      token: "",
+      sdk: "",
+      status: "ACTIVE",
+      environment: "SandBox",
       submitted: false,
       journeyValidation: false,
     };
@@ -113,32 +171,46 @@ export default {
       }
       return null;
     },
+    journeyUsernameState() {
+      if (this.submitted === true && this.journey.credentials.username === "") {
+        return false;
+      }
+      return null;
+    },
+    journeyPasswordState() {
+      if (this.submitted === true && this.journey.credentials.password === "") {
+        return false;
+      }
+      return null;
+    },
+    journeyTokenState() {
+      if (this.submitted === true && this.journey.credentials.token === "") {
+        return false;
+      }
+      return null;
+    },
+    journeySdkState() {
+      if (this.submitted === true && this.journey.credentials.sdk === "") {
+        return false;
+      }
+      return null;
+    },
   },
   watch: {
-    provider() {
-      this.journey.provider = this.provider;
-    },
-    journeyItem(journey) {
+    journey(journey) {
       if (journey !== null) {
-        if (journey.id === 0) {
-          // create journey
-          this.modalTitle = this.$t("Add Service");
-        } else {
-          // update journey
-          this.modalTitle = this.$t("Update Service");
-          this.journey = journey;
-          this.provider = journey.provider;
-        }
-        this.showModal();
+        this.name = journey.name;
+        this.description = journey.description;
+        this.username = journey.configuration.username;
+        this.password = journey.configuration.password;
+        this.token = journey.configuration.token;
+        this.sdk = journey.configuration.sdk;
+        this.environment = journey.configuration.environment;
+        this.status = journey.status;
       }
     },
-
   },
   methods: {
-    getServiceData(data) {
-      this.journeyValidation = data.validated;
-      this.journey.credentials = data.credentials;
-    },
     submit() {
       this.submitted = true;
       let body = false;
@@ -146,17 +218,22 @@ export default {
       this.$nextTick(() => {
         if (this.validate()) {
           body = {
-            name: this.journey.name,
-            description: this.journey.description,
-            credentials: this.journey.credentials,
-            status: this.journey.status,
+            name: this.name,
+            description: this.description,
+            configuration: {
+              username: this.username,
+              password: this.password,
+              token: this.token,
+              sdk: this.sdk,
+              environment: this.environment,
+            },
+            status: this.status,
           };
-          body.credentials.provider = this.journey.provider;
           this.hideModal();
           this.submitted = false;
         }
 
-        this.$emit("journeySubmit", body);
+        this.$emit("input", body);
       });
     },
     showModal() {
@@ -166,29 +243,37 @@ export default {
       this.$bvModal.hide("journey-modal");
     },
     validate() {
-      const { journey } = this;
-      console.log(journey.name, journey.provider, this.journeyValidation);
-
-      if (journey.name === undefined || journey.name === "") {
+      if (this.name === undefined || this.name === "") {
         return false;
       }
 
-      if (journey.provider === null) {
+      if (this.username === undefined || this.username === "") {
         return false;
       }
 
-      if (!this.journeyValidation) return false;
+      if (this.password === undefined || this.password === "") {
+        return false;
+      }
+
+      if (this.token === undefined || this.token === "") {
+        return false;
+      }
+
+      if (this.sdk === undefined || this.sdk === "") {
+        return false;
+      }
 
       return true;
     },
     clearService() {
-      this.journey = {
-        name: "",
-        description: "",
-        provider: null,
-        status: "ACTIVE",
-      };
-      this.journey.credentials = {};
+      this.name = "";
+      this.description = "";
+      this.username = "";
+      this.password = "";
+      this.token = "";
+      this.sdk = "";
+      this.status = "ACTIVE";
+      this.environment = "SandBox";
       this.journeyValidation = false;
       this.submitted = false;
       this.$emit("clearService");
