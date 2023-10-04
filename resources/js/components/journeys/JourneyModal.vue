@@ -41,7 +41,7 @@
     >
       <b-form-input
         id="journey-name"
-        v-model="credentials.username"
+        v-model="username"
         :placeholder="$t('Username')"
         :state="journeyUsernameState"
       />
@@ -55,7 +55,7 @@
     >
       <b-form-input
         id="journey-password"
-        v-model="credentials.password"
+        v-model="password"
         :state="journeyPasswordState"
         type="password"
       />
@@ -146,6 +146,7 @@ export default {
   data() {
     return {
       modalTitle: "Service",
+      id: "",
       name: "",
       description: "",
       username: "",
@@ -160,37 +161,31 @@ export default {
   },
   computed: {
     journeyNameState() {
-      if (this.submitted === true && this.journey.name === "") {
-        return false;
-      }
-      return null;
-    },
-    journeyProviderState() {
-      if (this.submitted === true && this.journey.provider === null) {
+      if (this.submitted === true && this.name === "") {
         return false;
       }
       return null;
     },
     journeyUsernameState() {
-      if (this.submitted === true && this.journey.credentials.username === "") {
+      if (this.submitted === true && this.username === "") {
         return false;
       }
       return null;
     },
     journeyPasswordState() {
-      if (this.submitted === true && this.journey.credentials.password === "") {
+      if (this.submitted === true && this.password === "") {
         return false;
       }
       return null;
     },
     journeyTokenState() {
-      if (this.submitted === true && this.journey.credentials.token === "") {
+      if (this.submitted === true && this.token === "") {
         return false;
       }
       return null;
     },
     journeySdkState() {
-      if (this.submitted === true && this.journey.credentials.sdk === "") {
+      if (this.submitted === true && this.sdk === "") {
         return false;
       }
       return null;
@@ -199,6 +194,7 @@ export default {
   watch: {
     journey(journey) {
       if (journey !== null) {
+        this.id = journey.id;
         this.name = journey.name;
         this.description = journey.description;
         this.username = journey.configuration.username;
@@ -207,6 +203,8 @@ export default {
         this.sdk = journey.configuration.sdk;
         this.environment = journey.configuration.environment;
         this.status = journey.status;
+
+        this.showModal();
       }
     },
   },
@@ -218,6 +216,7 @@ export default {
       this.$nextTick(() => {
         if (this.validate()) {
           body = {
+            id: this.id,
             name: this.name,
             description: this.description,
             configuration: {
@@ -233,7 +232,7 @@ export default {
           this.submitted = false;
         }
 
-        this.$emit("input", body);
+        this.$emit("submit", body);
       });
     },
     showModal() {
@@ -266,17 +265,7 @@ export default {
       return true;
     },
     clearService() {
-      this.name = "";
-      this.description = "";
-      this.username = "";
-      this.password = "";
-      this.token = "";
-      this.sdk = "";
-      this.status = "ACTIVE";
-      this.environment = "SandBox";
-      this.journeyValidation = false;
-      this.submitted = false;
-      this.$emit("clearService");
+      this.$emit("clearJourney");
     },
   },
 };

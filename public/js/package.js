@@ -105,6 +105,7 @@ __webpack_require__.r(__webpack_exports__);
   data: function data() {
     return {
       modalTitle: "Service",
+      id: "",
       name: "",
       description: "",
       username: "",
@@ -119,37 +120,31 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     journeyNameState: function journeyNameState() {
-      if (this.submitted === true && this.journey.name === "") {
-        return false;
-      }
-      return null;
-    },
-    journeyProviderState: function journeyProviderState() {
-      if (this.submitted === true && this.journey.provider === null) {
+      if (this.submitted === true && this.name === "") {
         return false;
       }
       return null;
     },
     journeyUsernameState: function journeyUsernameState() {
-      if (this.submitted === true && this.journey.credentials.username === "") {
+      if (this.submitted === true && this.username === "") {
         return false;
       }
       return null;
     },
     journeyPasswordState: function journeyPasswordState() {
-      if (this.submitted === true && this.journey.credentials.password === "") {
+      if (this.submitted === true && this.password === "") {
         return false;
       }
       return null;
     },
     journeyTokenState: function journeyTokenState() {
-      if (this.submitted === true && this.journey.credentials.token === "") {
+      if (this.submitted === true && this.token === "") {
         return false;
       }
       return null;
     },
     journeySdkState: function journeySdkState() {
-      if (this.submitted === true && this.journey.credentials.sdk === "") {
+      if (this.submitted === true && this.sdk === "") {
         return false;
       }
       return null;
@@ -158,6 +153,7 @@ __webpack_require__.r(__webpack_exports__);
   watch: {
     journey: function journey(_journey) {
       if (_journey !== null) {
+        this.id = _journey.id;
         this.name = _journey.name;
         this.description = _journey.description;
         this.username = _journey.configuration.username;
@@ -166,6 +162,7 @@ __webpack_require__.r(__webpack_exports__);
         this.sdk = _journey.configuration.sdk;
         this.environment = _journey.configuration.environment;
         this.status = _journey.status;
+        this.showModal();
       }
     }
   },
@@ -177,6 +174,7 @@ __webpack_require__.r(__webpack_exports__);
       this.$nextTick(function () {
         if (_this.validate()) {
           body = {
+            id: _this.id,
             name: _this.name,
             description: _this.description,
             configuration: {
@@ -191,7 +189,7 @@ __webpack_require__.r(__webpack_exports__);
           _this.hideModal();
           _this.submitted = false;
         }
-        _this.$emit("input", body);
+        _this.$emit("submit", body);
       });
     },
     showModal: function showModal() {
@@ -219,17 +217,7 @@ __webpack_require__.r(__webpack_exports__);
       return true;
     },
     clearService: function clearService() {
-      this.name = "";
-      this.description = "";
-      this.username = "";
-      this.password = "";
-      this.token = "";
-      this.sdk = "";
-      this.status = "ACTIVE";
-      this.environment = "SandBox";
-      this.journeyValidation = false;
-      this.submitted = false;
-      this.$emit("clearService");
+      this.$emit("clearJourney");
     }
   }
 });
@@ -267,6 +255,10 @@ __webpack_require__.r(__webpack_exports__);
         label: this.$t("Status"),
         sortable: true
       }, {
+        key: "configuration.environment",
+        label: this.$t("Environment"),
+        sortable: false
+      }, {
         key: "actions",
         label: this.$t("Actions"),
         thStyle: {
@@ -293,16 +285,19 @@ __webpack_require__.r(__webpack_exports__);
     },
     journeySubmit: function journeySubmit(body) {
       if (body) {
-        if (this.journey.id === 0) {
-          this.createJourney(body);
+        if (body.id !== undefined && body.id !== "") {
+          // update
+          this.updateJourney(body.id, body);
         } else {
-          this.updateJourney(this.journey.id, body);
+          // create
+          this.createJourney(body);
         }
+        this.clearJourney();
       }
     },
     createJourney: function createJourney(body) {
       var _this2 = this;
-      ProcessMaker.apiClient.post("/esign/journeys", body).then(function () {
+      ProcessMaker.apiClient.post("/alloy/journeys", body).then(function () {
         ProcessMaker.alert(_this2.$t("Journey successfully added"), "success");
       })["catch"](function (error) {
         if (error.response.status === 422) {
@@ -312,7 +307,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     updateJourney: function updateJourney(id, body) {
       var _this3 = this;
-      ProcessMaker.apiClient.put("/esign/journeys/".concat(id), body).then(function () {
+      ProcessMaker.apiClient.put("/alloy/journeys/".concat(id), body).then(function () {
         ProcessMaker.alert("Journey successfully updated", "success");
       })["catch"](function (error) {
         if (error.response.status === 422) {
@@ -323,7 +318,7 @@ __webpack_require__.r(__webpack_exports__);
     deleteJourney: function deleteJourney(id) {
       var _this4 = this;
       ProcessMaker.confirmModal("Caution!", this.$t("Are you sure to delete this journey?"), "", function () {
-        ProcessMaker.apiClient["delete"]("/esign/journeys/".concat(id)).then(function () {
+        ProcessMaker.apiClient["delete"]("/alloy/journeys/".concat(id)).then(function () {
           ProcessMaker.alert("Journey successfully deleted", "success");
           _this4.clearJourney();
         })["catch"](function (error) {
@@ -333,13 +328,25 @@ __webpack_require__.r(__webpack_exports__);
         });
       });
     },
+    toggleJourneyModal: function toggleJourneyModal() {
+      this.selectedJourney = {
+        name: "",
+        status: "ACTIVE",
+        configuration: {
+          username: "",
+          provider: "",
+          password: "",
+          token: "",
+          sdk: "",
+          environment: "SandBox"
+        }
+      };
+    },
     editJourney: function editJourney(item) {
-      var journey = item;
-      journey.provider = item.credentials.provider;
-      this.journey = journey;
+      this.selectedJourney = item;
     },
     clearJourney: function clearJourney() {
-      this.journey = null;
+      this.selectedJourney = null;
       this.$refs.journeys.refresh();
     }
   }
@@ -461,11 +468,11 @@ var render = function render() {
       state: _vm.journeyUsernameState
     },
     model: {
-      value: _vm.credentials.username,
+      value: _vm.username,
       callback: function callback($$v) {
-        _vm.$set(_vm.credentials, "username", $$v);
+        _vm.username = $$v;
       },
-      expression: "credentials.username"
+      expression: "username"
     }
   })], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
@@ -482,11 +489,11 @@ var render = function render() {
       type: "password"
     },
     model: {
-      value: _vm.credentials.password,
+      value: _vm.password,
       callback: function callback($$v) {
-        _vm.$set(_vm.credentials, "password", $$v);
+        _vm.password = $$v;
       },
-      expression: "credentials.password"
+      expression: "password"
     }
   })], 1), _vm._v(" "), _c("b-form-group", {
     attrs: {
@@ -620,9 +627,7 @@ var render = function render() {
     },
     on: {
       click: function click($event) {
-        _vm.journey = {
-          id: 0
-        };
+        return _vm.toggleJourneyModal();
       }
     }
   }, [_c("i", {
@@ -753,16 +758,12 @@ var render = function render() {
   })], 1), _vm._v(" "), _c("div", {
     staticClass: "col-12 col-md-6 col-lg-4 order-md-1 text-center text-md-left mb-3"
   }, [_vm._v("\n        " + _vm._s(1 + (_vm.meta.current_page - 1) * 10) + " -\n        " + _vm._s(_vm.meta.total > _vm.meta.current_page * 10 ? _vm.meta.current_page * 10 : _vm.meta.total) + "\n        " + _vm._s(_vm.$t("of")) + " " + _vm._s(_vm.meta.total) + " " + _vm._s(_vm.$t("Journeys")) + "\n      ")])])], 1), _vm._v(" "), _c("journey-modal", {
-    on: {
-      clearJourney: _vm.clearJourney,
-      journeySubmit: _vm.journeySubmit
+    attrs: {
+      journey: _vm.selectedJourney
     },
-    model: {
-      value: _vm.selectedJourney,
-      callback: function callback($$v) {
-        _vm.selectedJourney = $$v;
-      },
-      expression: "selectedJourney"
+    on: {
+      submit: _vm.journeySubmit,
+      clearJourney: _vm.clearJourney
     }
   })], 1);
 };

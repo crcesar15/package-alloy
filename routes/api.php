@@ -9,5 +9,8 @@ Route::group(
     ],
     function () {
         Route::get('/journeys', 'JourneysController@fetch')->name('journeys.fetch');
+        Route::post('/journeys', 'JourneysController@store')->name('journeys.store');
+        Route::put('/journeys/{id}', 'JourneysController@update')->name('journeys.update');
+        Route::delete('/journeys/{id}', 'JourneysController@destroy')->name('journeys.destroy');
     }
 );

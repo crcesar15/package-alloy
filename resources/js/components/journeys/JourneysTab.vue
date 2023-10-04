@@ -10,7 +10,7 @@
       <div class="col-12 col-md-6 col-lg-2">
         <b-button
           block
-          @click="journey = { id: 0 }"
+          @click="toggleJourneyModal()"
         >
           <i class="fa fa-plus" /> {{ $t('Journey') }}
         </b-button>
@@ -100,9 +100,9 @@
       </div>
     </b-card-text>
     <journey-modal
-      v-model="selectedJourney"
+      :journey="selectedJourney"
+      @submit="journeySubmit"
       @clearJourney="clearJourney"
-      @journeySubmit="journeySubmit"
     />
   </b-card>
 </template>
@@ -132,6 +132,11 @@ export default {
           sortable: true,
         },
         {
+          key: "configuration.environment",
+          label: this.$t("Environment"),
+          sortable: false,
+        },
+        {
           key: "actions",
           label: this.$t("Actions"),
           thStyle: { width: "100px", textAlign: "center" },
@@ -158,16 +163,19 @@ export default {
     },
     journeySubmit(body) {
       if (body) {
-        if (this.journey.id === 0) {
-          this.createJourney(body);
+        if (body.id !== undefined && body.id !== "") {
+          // update
+          this.updateJourney(body.id, body);
         } else {
-          this.updateJourney(this.journey.id, body);
+          // create
+          this.createJourney(body);
         }
+        this.clearJourney();
       }
     },
     createJourney(body) {
       ProcessMaker.apiClient
-        .post("/esign/journeys", body)
+        .post("/alloy/journeys", body)
         .then(() => {
           ProcessMaker.alert(this.$t("Journey successfully added"), "success");
         })
@@ -179,7 +187,7 @@ export default {
     },
     updateJourney(id, body) {
       ProcessMaker.apiClient
-        .put(`/esign/journeys/${id}`, body)
+        .put(`/alloy/journeys/${id}`, body)
         .then(() => {
           ProcessMaker.alert("Journey successfully updated", "success");
         })
@@ -196,7 +204,7 @@ export default {
         "",
         () => {
           ProcessMaker.apiClient
-            .delete(`/esign/journeys/${id}`)
+            .delete(`/alloy/journeys/${id}`)
             .then(() => {
               ProcessMaker.alert("Journey successfully deleted", "success");
               this.clearJourney();
@@ -209,13 +217,25 @@ export default {
         },
       );
     },
+    toggleJourneyModal() {
+      this.selectedJourney = {
+        name: "",
+        status: "ACTIVE",
+        configuration: {
+          username: "",
+          provider: "",
+          password: "",
+          token: "",
+          sdk: "",
+          environment: "SandBox",
+        },
+      };
+    },
     editJourney(item) {
-      const journey = item;
-      journey.provider = item.credentials.provider;
-      this.journey = journey;
+      this.selectedJourney = item;
     },
     clearJourney() {
-      this.journey = null;
+      this.selectedJourney = null;
       this.$refs.journeys.refresh();
     },
   },

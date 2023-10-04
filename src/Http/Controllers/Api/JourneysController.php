@@ -46,4 +46,50 @@ class JourneysController extends Controller
 
         return new ApiCollection($response);
     }
+
+    /**
+     * Store a new journey.
+     *
+     * @param Request $request Laravel Requests
+     *
+     * @return Journey
+     */
+    public function store(Request $request)
+    {
+        $journey = new Journey();
+        $journey->fill($request->all());
+        $journey->save();
+
+        return $journey;
+    }
+
+    /**
+     * Update a journey.
+     *
+     * @param Request $request Laravel Requests
+     * @param string  $id      Journey ID
+     *
+     * @return Journey
+     */
+    public function update(Request $request, $id)
+    {
+        $journey = Journey::findOrFail($id);
+        $journey->fill($request->all());
+        $journey->save();
+
+        return $journey;
+    }
+
+    /**
+     * Delete a journey.
+     *
+     * @param string $id Journey ID
+     *
+     * @return void
+     */
+    public function destroy($id)
+    {
+        $journey = Journey::findOrFail($id);
+        $journey->delete();
+    }
 }
