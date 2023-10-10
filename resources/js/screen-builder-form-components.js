@@ -25,7 +25,13 @@ window.ProcessMaker.EventBus.$on("screen-builder-init", (manager) => {
         fontSize: "1em",
         icon: "fas fa-id-card",
         alloyConfig: {
-          id: 1,
+          requestBody: null,
+          journey: null,
+          theme: {
+            primaryColor: null,
+            backgroundColor: null,
+            textColor: null,
+          },
         },
         helper: null,
       },
@@ -46,7 +52,7 @@ window.ProcessMaker.EventBus.$on("screen-builder-init", (manager) => {
           config: {
             // other props for AlloyInspector
             label: "Alloy Inspector",
-            name: "new_alloy_component2",
+            name: "new_alloy_components",
           },
         },
         {

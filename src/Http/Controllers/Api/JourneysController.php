@@ -48,6 +48,18 @@ class JourneysController extends Controller
     }
 
     /**
+     * Fetch a journey.
+     *
+     * @param string $id Journey ID
+     *
+     * @return Journey
+     */
+    public function show($id)
+    {
+        return Journey::findOrFail($id);
+    }
+
+    /**
      * Store a new journey.
      *
      * @param Request $request Laravel Requests

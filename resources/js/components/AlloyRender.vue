@@ -1,18 +1,5 @@
 <template>
   <div>
-    <b-form-group
-      label="Name"
-      label-for="name"
-    >
-      <b-form-input
-        id="name"
-        v-model="output"
-        type="text"
-        placeholder="Enter the name of the controller"
-        @input="onInput"
-      />
-      <b-form-group />
-    </b-form-group>
     <b-button
       variant="info"
       @click="openAlloy()"
@@ -27,21 +14,31 @@
 import alloy from "@alloyidentity/web-sdk";
 
 export default {
+  props: {
+    alloyConfig: {
+      type: Object,
+      default: () => { },
+    },
+    name: {
+      type: String,
+      default: "alloy",
+    },
+  },
   data() {
     return {
       output: "",
       alloyInitParams: {
-        key: "a7fcdfe0-7226-4be9-a8bf-6c0fdb497c9b",
-        journeyApplicationToken: "JA-iYSmwNe7djplfNNcNNPH",
+        key: null,
+        journeyApplicationToken: null,
         production: false,
-        journeyToken: "J-zT8lr6acygRQmePjBA5",
+        journeyToken: null,
         isReactNative: false,
         isNext: false,
         customStyle: {
           theme: {
-            primaryColor: "#F46A35",
-            backgroundColor: "#ffffff",
-            textColor: "#121212",
+            primaryColor: null,
+            backgroundColor: null,
+            textColor: null,
             borderRadius: "10px",
           },
         },
@@ -49,7 +46,7 @@ export default {
     };
   },
   mounted() {
-    alloy.init(this.alloyInitParams);
+    // alloy.init(this.alloyInitParams);
   },
   methods: {
     onInput(value) {
@@ -58,8 +55,27 @@ export default {
     callback(data) {
       console.log(data);
     },
-    openAlloy() {
-      alloy.open(this.callback, "alloy-box");
+    async openAlloy() {
+      await this.getJourneyCredentials();
+    },
+    getJourneyCredentials() {
+      ProcessMaker.apiClient.get(`alloy/journeys/${this.alloyConfig.journey.id}`)
+        .then((res) => {
+          this.alloyInitParams.key = res.data.data.configuration.sdk;
+          this.alloyInitParams.journeyToken = res.data.data.configuration.journeyToken;
+          this.alloyInitParams.customStyle.theme.primaryColor = res.data.data.theme.primaryColor;
+          this.alloyInitParams.customStyle.theme.backgroundColor = res.data.data.theme.backgroundColor;
+          this.alloyInitParams.customStyle.theme.textColor = res.data.data.theme.textColor;
+        });
+    },
+    createJourneySession() {
+      ProcessMaker.apiClient.post("alloy/session", {
+        id: this.alloyConfig.journey.id,
+        data: this.alloyConfig.requestBody,
+      })
+        .then((res) => {
+          this.alloyInitParams.journeyToken = res.data.data.configuration.journeyToken;
+        });
     },
   },
 };
