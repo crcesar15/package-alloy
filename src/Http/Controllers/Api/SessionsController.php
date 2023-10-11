@@ -69,6 +69,8 @@ class SessionsController extends Controller
     public function store(Request $request)
     {
         $journey = new AlloySession();
+
+        return $request->all();
         $journey->fill($request->all());
         $journey->save();
 

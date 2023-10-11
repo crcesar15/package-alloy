@@ -25,6 +25,7 @@ window.ProcessMaker.EventBus.$on("screen-builder-init", (manager) => {
         fontSize: "1em",
         icon: "fas fa-id-card",
         alloyConfig: {
+          requestId: null,
           requestBody: null,
           journey: null,
           theme: {

@@ -8,6 +8,20 @@
     </div>
     <div class="border-bottom p-4">
       <b-form-group
+        :label="$t('Request ID')"
+        class="m-0"
+      >
+        <b-form-input
+          v-model="requestId"
+          @input="$emit('input', newValue)"
+        />
+        <b-form-text>
+          {{ $t('Process request ID') }}
+        </b-form-text>
+      </b-form-group>
+    </div>
+    <div class="border-bottom p-4">
+      <b-form-group
         :label="$t('Body Content')"
         class="m-0"
       >
@@ -83,6 +97,7 @@ export default {
   },
   data() {
     return {
+      requestId: null,
       requestBody: null,
       journey: null,
       primaryColor: null,
@@ -93,6 +108,7 @@ export default {
   computed: {
     newValue() {
       return {
+        requestId: this.requestId,
         requestBody: this.requestBody,
         journey: this.journey,
         theme: {
@@ -106,6 +122,7 @@ export default {
   watch: {
     value: {
       handler() {
+        this.requestId = this.value.requestId;
         this.requestBody = this.value.requestBody;
         this.journey = this.value.journey;
         this.primaryColor = this.value.theme.primaryColor;
@@ -116,6 +133,7 @@ export default {
     },
   },
   mounted() {
+    this.requestId = this.value.requestId;
     this.requestBody = this.value.requestBody;
     this.journey = this.value.journey;
     this.primaryColor = this.value.theme.primaryColor;
