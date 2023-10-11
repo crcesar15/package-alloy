@@ -5,6 +5,8 @@ namespace ProcessMaker\Package\Alloy\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use ProcessMaker\Http\Controllers\Controller;
 use ProcessMaker\Http\Resources\ApiCollection;
+use ProcessMaker\Package\Alloy\Handlers\AlloyHandler;
+use ProcessMaker\Package\Alloy\Models\AlloyJourney as Journey;
 use ProcessMaker\Package\Alloy\Models\AlloySession;
 
 class SessionsController extends Controller
@@ -68,13 +70,25 @@ class SessionsController extends Controller
      */
     public function store(Request $request)
     {
-        $journey = new AlloySession();
+        $alloyApplication = new AlloySession();
 
-        return $request->all();
-        $journey->fill($request->all());
-        $journey->save();
+        $journey = Journey::findOrFail($request->input('journeyId'));
 
-        return $journey;
+        $handler = new AlloyHandler($journey->configuration);
+
+        // $application = $handler->getJourneyApplication($journey->configuration['token'], 'JA-FNRqNcWVWY8eADLdqzU6');
+        $application = $handler->createJourneyApplication($journey->configuration['token'], $request->input('data'));
+
+        $alloyApplication->fill([
+            'request_id' => $request->input('requestId'),
+            'journey_id' => $request->input('journeyId'),
+            'payload' => $request->input('data'),
+            'properties' => $application,
+        ]);
+
+        $alloyApplication->save();
+
+        return $alloyApplication;
     }
 
     /**

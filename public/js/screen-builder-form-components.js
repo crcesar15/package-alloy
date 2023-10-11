@@ -2229,52 +2229,55 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         journeyToken: null,
         isReactNative: false,
         isNext: false,
-        customStyle: {
-          theme: {
-            primaryColor: null,
-            backgroundColor: null,
-            textColor: null,
-            borderRadius: "10px"
-          }
+        color: {
+          primary: null,
+          secondary: null
         }
       }
     };
-  },
-  mounted: function mounted() {
-    // alloy.init(this.alloyInitParams);
   },
   methods: {
     onInput: function onInput(value) {
       this.$emit("input", value);
     },
     callback: function callback(data) {
+      console.log("callback");
       console.log(data);
     },
     openAlloy: function openAlloy() {
       var _this = this;
       return _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var requestId, requestBody;
+        var requestId, requestBody, alloySession, init;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              _this.busy = true;
+              _context.next = 3;
               return _this.getJourneyCredentials();
-            case 2:
+            case 3:
               requestId = _this.getRequestData(_this.alloyConfig.requestId);
               requestBody = _this.getRequestData(_this.alloyConfig.requestBody);
               if (!(requestId === null || requestBody === null)) {
-                _context.next = 7;
+                _context.next = 8;
                 break;
               }
               ProcessMaker.alert("Please fill in the request ID and request body fields.", "danger");
               return _context.abrupt("return");
-            case 7:
-              _context.next = 9;
+            case 8:
+              _context.next = 10;
               return _this.createJourneySession(requestId, requestBody);
-            case 9:
-              _this.busy = true;
-              console.log(requestBody);
-            case 11:
+            case 10:
+              alloySession = _context.sent;
+              _this.alloyInitParams.journeyApplicationToken = alloySession.properties.response.journey_application_token;
+              _context.next = 14;
+              return _alloyidentity_web_sdk__WEBPACK_IMPORTED_MODULE_0__["default"].init(_this.alloyInitParams);
+            case 14:
+              init = _context.sent;
+              console.log(_this.alloyInitParams);
+              console.log(init);
+              _context.next = 19;
+              return _alloyidentity_web_sdk__WEBPACK_IMPORTED_MODULE_0__["default"].open(_this.callback);
+            case 19:
             case "end":
               return _context.stop();
           }
@@ -2283,21 +2286,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     getJourneyCredentials: function getJourneyCredentials() {
       var _this2 = this;
-      ProcessMaker.apiClient.get("alloy/journeys/".concat(this.alloyConfig.journey.id)).then(function (res) {
+      return ProcessMaker.apiClient.get("alloy/journeys/".concat(this.alloyConfig.journey.id)).then(function (res) {
         _this2.alloyInitParams.key = res.data.configuration.sdk;
         _this2.alloyInitParams.journeyToken = res.data.configuration.token;
-        _this2.alloyInitParams.customStyle.theme.primaryColor = _this2.alloyConfig.theme.primaryColor;
-        _this2.alloyInitParams.customStyle.theme.backgroundColor = _this2.alloyConfig.theme.backgroundColor;
-        _this2.alloyInitParams.customStyle.theme.textColor = _this2.alloyConfig.theme.textColor;
+        _this2.alloyInitParams.production = res.data.configuration.environment === "Production";
+        _this2.alloyInitParams.color.primary = _this2.alloyConfig.theme.primaryColor;
+        _this2.alloyInitParams.color.secondary = _this2.alloyConfig.theme.backgroundColor;
       });
     },
     createJourneySession: function createJourneySession(requestId, requestBody) {
-      ProcessMaker.apiClient.post("alloy/sessions", {
-        id: requestId,
+      return ProcessMaker.apiClient.post("alloy/sessions", {
+        requestId: requestId,
         journeyId: this.alloyConfig.journey.id,
         data: requestBody
       }).then(function (res) {
-        console.log(res);
+        return res.data;
       });
     },
     getRequestData: function getRequestData(variableName) {
@@ -2601,11 +2604,7 @@ var render = function render() {
     staticClass: "text-center my-2"
   }, [_c("b-spinner", {
     staticClass: "align-middle"
-  }), _vm._v(" "), _c("strong", [_vm._v("Waiting for alloy...")])], 1), _vm._v(" "), _c("div", {
-    attrs: {
-      id: "alloy-box"
-    }
-  })], 1);
+  }), _vm._v(" "), _c("strong", [_vm._v("Waiting for alloy...")])], 1)], 1);
 };
 var staticRenderFns = [];
 render._withStripped = true;
