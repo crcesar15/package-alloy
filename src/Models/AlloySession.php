@@ -14,6 +14,7 @@
 namespace ProcessMaker\Package\Alloy\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use ProcessMaker\Package\Alloy\Models\AlloyJourney;
 
 /**
  * Handles the Esign Services Model.
@@ -36,4 +37,9 @@ class AlloySession extends Model
         'payload' => 'json',
         'properties' => 'json',
     ];
+
+    public function journey()
+    {
+        return $this->belongsTo(AlloyJourney::class, 'journey_id');
+    }
 }

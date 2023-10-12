@@ -23,7 +23,8 @@
             <b-tab title="{{ __('Journeys') }}" active>
                 <journeys-tab></journeys-tab>
             </b-tab>
-            <b-tab title="{{ __('Logs') }}" lazy>
+            <b-tab title="{{ __('Sessions') }}" lazy>
+                <sessions-tab></sessions-tab>
             </b-tab>
         </b-tabs>
     </div>

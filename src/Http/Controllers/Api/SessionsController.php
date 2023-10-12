@@ -21,6 +21,7 @@ class SessionsController extends Controller
     public function fetch(Request $request)
     {
         $query = AlloySession::query();
+        $query->with('journey');
 
         $filter = $request->input('filter', '');
         $filter_by = $request->input('filter_by', 'name');
@@ -76,8 +77,8 @@ class SessionsController extends Controller
 
         $handler = new AlloyHandler($journey->configuration);
 
-        // $application = $handler->getJourneyApplication($journey->configuration['token'], 'JA-FNRqNcWVWY8eADLdqzU6');
-        $application = $handler->createJourneyApplication($journey->configuration['token'], $request->input('data'));
+        $application = $handler->getJourneyApplication($journey->configuration['token'], 'JA-FNRqNcWVWY8eADLdqzU6');
+        // $application = $handler->createJourneyApplication($journey->configuration['token'], $request->input('data'));
 
         $alloyApplication->fill([
             'request_id' => $request->input('requestId'),
